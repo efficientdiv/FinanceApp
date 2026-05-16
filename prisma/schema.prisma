@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  password  String?
+  createdAt DateTime @default(now())
+
+  accounts          Account[]
+  transactions      Transaction[]
+  categories        Category[]
+  holdings          Holding[]
+  watchlistItems    WatchlistItem[]
+  portfolioSnapshots PortfolioSnapshot[]
+  insights          Insight[]
+  payees            Payee[]
+
+  // NextAuth
+  authAccounts AuthAccount[]
+  sessions     Session[]
+}
+
+model AuthAccount {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── Financial accounts ────────────────────────────────────────────────────
+
+enum AccountKind {
+  CHECKING
+  SAVINGS
+  BROKERAGE
+  RETIREMENT
+  CREDIT
+}
+
+model Account {
+  id          String      @id @default(cuid())
+  userId      String
+  name        String
+  institution String
+  mask        String
+  kind        AccountKind
+  balanceCents Int        @default(0)
+  apy         String?
+  plaidItemId String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  holdings     Holding[]
+}
+
+// ── Transactions ──────────────────────────────────────────────────────────
+
+enum TransactionStatus {
+  POSTED
+  PENDING
+}
+
+model Transaction {
+  id         String            @id @default(cuid())
+  userId     String
+  accountId  String?
+  merchant   String
+  amountCents Int
+  category   String
+  iconKey    String            @default("briefcase")
+  date       DateTime
+  method     String
+  status     TransactionStatus @default(POSTED)
+  notes      String?
+  isRecurring Boolean          @default(false)
+  plaidId    String?           @unique
+  createdAt  DateTime          @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account? @relation(fields: [accountId], references: [id])
+}
+
+// ── Categories ────────────────────────────────────────────────────────────
+
+model Category {
+  id             String  @id @default(cuid())
+  userId         String
+  name           String
+  color          String
+  iconKey        String
+  budgetMonthlyCents Int?
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+}
+
+// ── Investments ───────────────────────────────────────────────────────────
+
+model Holding {
+  id           String  @id @default(cuid())
+  userId       String
+  accountId    String
+  symbol       String
+  shares       Float
+  costBasisCents Int
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, accountId, symbol])
+}
+
+model WatchlistItem {
+  id     String @id @default(cuid())
+  userId String
+  symbol String
+  order  Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, symbol])
+}
+
+// ── Portfolio snapshots ───────────────────────────────────────────────────
+
+model PortfolioSnapshot {
+  id         String   @id @default(cuid())
+  userId     String
+  date       DateTime
+  totalValueCents Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+// ── Insights ──────────────────────────────────────────────────────────────
+
+model Insight {
+  id          String    @id @default(cuid())
+  userId      String
+  kind        String
+  tag         String
+  title       String
+  body        String
+  ctaLabel    String
+  ctaHref     String?
+  tone        String    @default("bone")
+  dismissedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Payees ────────────────────────────────────────────────────────────────
+
+model Payee {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  accountNo String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

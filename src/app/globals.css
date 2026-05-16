@@ -1,26 +1,342 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Tailwind v4 theme tokens ─────────────────────────────────────────────── */
+@theme {
+  /* ink palette */
+  --color-ink-950: #08080a;
+  --color-ink-900: #0b0b0d;
+  --color-ink-850: #101013;
+  --color-ink-800: #15151a;
+  --color-ink-750: #1a1a20;
+  --color-ink-700: #222229;
+  --color-ink-600: #2e2e36;
+
+  /* semantic */
+  --color-bone: #ece9e1;
+  --color-gain: #3fb27f;
+  --color-loss: #e26464;
+
+  /* font stacks — actual loading via next/font CSS vars */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+html,
+body {
+  background: #08080a;
+  color: #ece9e1;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Utility helpers (not expressible as Tailwind utilities) ──────────────── */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.grain {
+  background-image: radial-gradient(
+      1200px 600px at 80% -10%,
+      rgba(236, 233, 225, 0.04),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 500px at -10% 20%,
+      rgba(63, 178, 127, 0.035),
+      transparent 60%
+    );
+}
+
+.num-shrink {
+  letter-spacing: -0.02em;
+}
+
+/* ── Component helpers ────────────────────────────────────────────────────── */
+.seg-active {
+  background: rgba(236, 233, 225, 0.06);
+  color: #ece9e1;
+}
+
+.hover-row {
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.hover-row:hover {
+  background: rgba(236, 233, 225, 0.028);
+}
+
+.hover-row:active {
+  transform: scale(0.995);
+  background: rgba(236, 233, 225, 0.04);
+}
+
+.card {
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.012),
+      transparent 30%
+    ),
+    #0d0d10;
+}
+
+.ring-soft {
+  box-shadow: inset 0 0 0 1px rgba(236, 233, 225, 0.06);
+}
+
+/* ── Pulse dot ────────────────────────────────────────────────────────────── */
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #3fb27f;
+  box-shadow: 0 0 0 0 rgba(63, 178, 127, 0.6);
+  animation: pulse 2.2s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(63, 178, 127, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(63, 178, 127, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(63, 178, 127, 0);
+  }
+}
+
+/* ── Entrance animations ──────────────────────────────────────────────────── */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bar-fill {
+  from { width: 0 !important; }
+}
+
+.animate-enter {
+  animation: fade-in-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.delay-1 { animation-delay: 60ms; }
+.delay-2 { animation-delay: 120ms; }
+.delay-3 { animation-delay: 180ms; }
+.delay-4 { animation-delay: 240ms; }
+.delay-5 { animation-delay: 300ms; }
+.delay-6 { animation-delay: 360ms; }
+
+.bar-animate {
+  animation: bar-fill 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-enter,
+  .bar-animate {
+    animation: none !important;
+  }
+}
+
+/* ── Nav ──────────────────────────────────────────────────────────────────── */
+.nav-link {
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.nav-link:hover {
+  color: #ece9e1;
+}
+
+/* ── Card hover lift ──────────────────────────────────────────────────────── */
+.card-hover {
+  transition: box-shadow 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.card-hover:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(236, 233, 225, 0.07);
+  transform: translateY(-2px);
+}
+
+.card-hover:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+/* ── Modal animations ─────────────────────────────────────────────────────── */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-modal {
+  animation: slide-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease both;
+}
+
+/* ── Light mode ───────────────────────────────────────────────────────────── */
+/*
+ * The key trick: overriding --color-white flips ALL Tailwind utilities that
+ * use white (text-white/*, bg-white/*, ring-white/*) to use a near-black
+ * instead, so the entire opacity system inverts without touching components.
+ */
+html.light {
+  --color-ink-950: #f2ede6;
+  --color-ink-900: #ebe5dd;
+  --color-ink-850: #e2dbd2;
+  --color-ink-800: #d8d0c6;
+  --color-ink-750: #ccc3b8;
+  --color-ink-700: #bcb3a6;
+  --color-ink-600: #a9a093;
+  --color-bone: #1a1510;
+  --color-white: #1a1510;   /* flips all text-white/* bg-white/* ring-white/* */
+  --color-gain: #25825a;
+  --color-loss: #b83535;
+  --tooltip-bg: #ffffff;
+}
+
+html.light body {
+  background: var(--color-ink-950);
+  color: var(--color-bone);
+}
+
+html.light .card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.35) 30%), #ffffff;
+}
+
+html.light .ring-soft {
+  box-shadow: inset 0 0 0 1px rgba(26,21,16,0.1);
+}
+
+html.light .grain {
+  background-image:
+    radial-gradient(1200px 600px at 80% -10%, rgba(26,21,16,0.02), transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, rgba(37,130,90,0.05), transparent 60%);
+}
+
+html.light .hover-row:hover {
+  background: rgba(26,21,16,0.045);
+}
+
+html.light .hover-row:active {
+  transform: scale(0.995);
+  background: rgba(26,21,16,0.08);
+}
+
+html.light .seg-active {
+  background: rgba(26,21,16,0.09);
+  color: #1a1510;
+}
+
+html.light .nav-link:hover {
+  color: #1a1510;
+  background: rgba(26,21,16,0.05);
+}
+
+html.light .card-hover:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 0 0 1px rgba(26,21,16,0.07);
+  transform: translateY(-2px);
+}
+
+html.light .card-hover:active {
+  transform: translateY(0) scale(0.99);
+}
+
+html.light .pulse-dot {
+  background: #25825a;
+  box-shadow: 0 0 0 0 rgba(37,130,90,0.6);
+}
+
+/* Recharts axis ticks — darken in light mode */
+html.light .recharts-cartesian-axis-tick text {
+  fill: #9a9188;
+}
+
+html.light .recharts-tooltip-cursor {
+  stroke: rgba(26,21,16,0.2) !important;
+}
+
+/* Scrollbar */
+html.light ::-webkit-scrollbar-thumb {
+  background: #d8d0c6;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #ccc3b8;
+}
+
+/* ── Recharts overrides ───────────────────────────────────────────────────── */
+.recharts-cartesian-axis-tick text {
+  fill: #6b6b76;
+  font-size: 11px;
+}
+
+.recharts-default-tooltip {
+  display: none !important;
+}
+
+.recharts-active-dot circle {
+  stroke: #ece9e1 !important;
+  stroke-width: 1.5 !important;
+}
+
+.recharts-tooltip-cursor {
+  stroke: rgba(236, 233, 225, 0.18) !important;
+  stroke-dasharray: 3 3 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recharts-line,
+  .recharts-area {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a20;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2e2e36;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
