@@ -105,7 +105,7 @@ export function LoginForm() {
           onClick={() => {
             const email = document.getElementById('email') as HTMLInputElement | null
             const password = document.getElementById('password') as HTMLInputElement | null
-            if (email) email.value = 'eleanor@luxfinance.demo'
+            if (email) email.value = 'eleanor@vaultr.demo'
             if (password) password.value = 'demo1234!'
           }}
           className="text-[11px] text-white/30 hover:text-white/60 border border-white/[0.08] hover:border-white/[0.16] px-3 py-1 rounded-md transition"
