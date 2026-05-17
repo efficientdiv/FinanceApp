@@ -3,20 +3,13 @@ import { TopNav } from '@/components/nav/TopNav'
 import { Card } from '@/components/ui/Card'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { Icons } from '@/components/ui/Icons'
-import { requireUserId, getAccounts } from '@/lib/data'
+import { getDemoUserId, getAccounts } from '@/lib/data'
 import { centsToDollars } from '@/lib/utils'
 import { Money } from '@/components/ui/Money'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
 export default async function AccountsPage() {
-  let userId: string
-  try {
-    userId = await requireUserId()
-  } catch {
-    redirect('/login')
-  }
-
+  const userId = await getDemoUserId()
   const accounts = await getAccounts(userId)
 
   const totalCents = accounts.reduce((s, a) => s + a.balanceCents, 0)

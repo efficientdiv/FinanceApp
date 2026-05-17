@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from '@/components/providers/Toaster'
 import { CommandPalette } from '@/components/providers/CommandPalette'
-import { SessionProvider } from '@/components/providers/SessionProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { CurrencyProvider } from '@/components/providers/CurrencyProvider'
 import { MobileNav } from '@/components/nav/MobileNav'
@@ -53,12 +52,10 @@ export default function RootLayout({
       <body className="min-h-full bg-ink-950 antialiased pb-[72px] md:pb-0">
         <ThemeProvider>
           <CurrencyProvider>
-          <SessionProvider>
             {children}
             <MobileNav />
             <Toaster />
             <CommandPalette />
-          </SessionProvider>
           </CurrencyProvider>
         </ThemeProvider>
       </body>

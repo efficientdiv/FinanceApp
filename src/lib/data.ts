@@ -1,18 +1,13 @@
 import 'server-only'
-import { auth } from './auth'
 import { prisma } from './prisma'
 import { centsToDollars } from './utils'
 import type { Account, Transaction, Insight, WatchlistItem } from '@/generated/prisma/client'
 
-/* ── Auth helper ──────────────────────────────────────────────────────────── */
-export async function getCurrentUser() {
-  const session = await auth()
-  return session?.user ?? null
-}
+const DEMO_EMAIL = 'eleanor@vaultr.demo'
 
-export async function requireUserId(): Promise<string> {
-  const user = await getCurrentUser()
-  if (!user?.id) throw new Error('Not authenticated')
+export async function getDemoUserId(): Promise<string> {
+  const user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL }, select: { id: true } })
+  if (!user) throw new Error('Demo user not found — run prisma/seed.ts')
   return user.id
 }
 

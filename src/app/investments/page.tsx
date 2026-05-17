@@ -1,23 +1,17 @@
 
-import { redirect } from 'next/navigation'
 import { TopNav } from '@/components/nav/TopNav'
 import { Card } from '@/components/ui/Card'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { Watchlist } from '@/components/dashboard/Watchlist'
-import { requireUserId } from '@/lib/data'
+import { getDemoUserId } from '@/lib/data'
 import { prisma } from '@/lib/prisma'
 import { centsToDollars } from '@/lib/utils'
 import { Money } from '@/components/ui/Money'
 
 export default async function InvestmentsPage() {
-  let userId: string
-  try {
-    userId = await requireUserId()
-  } catch {
-    redirect('/login')
-  }
+  const userId = await getDemoUserId()
 
-  const [holdings, watchlistItems] = await Promise.all([
+  const [holdings] = await Promise.all([
     prisma.holding.findMany({ where: { userId } }),
     prisma.watchlistItem.findMany({ where: { userId }, orderBy: { order: 'asc' } }),
   ])

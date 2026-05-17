@@ -1,8 +1,7 @@
 
-import { redirect } from 'next/navigation'
 import { TopNav } from '@/components/nav/TopNav'
 import { Transactions } from '@/components/dashboard/Transactions'
-import { requireUserId, getTransactions } from '@/lib/data'
+import { getDemoUserId, getTransactions } from '@/lib/data'
 import { centsToDollars } from '@/lib/utils'
 import type { TxFilters } from '@/lib/data'
 
@@ -14,13 +13,7 @@ export default async function TransactionsPage({
 }: {
   searchParams: Promise<{ tab?: string; category?: string }>
 }) {
-  let userId: string
-  try {
-    userId = await requireUserId()
-  } catch {
-    redirect('/login')
-  }
-
+  const userId = await getDemoUserId()
   const { tab: rawTab, category } = await searchParams
   const tab = (VALID_TABS.includes(rawTab as TabType) ? rawTab : 'All') as TxFilters['tab']
   const dbTxs = await getTransactions(userId, {

@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSession, signOut } from 'next-auth/react'
 import { Icons } from '@/components/ui/Icons'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { useCurrency, CURRENCIES, CURRENCY_ORDER } from '@/components/providers/CurrencyProvider'
@@ -17,15 +16,9 @@ const NAV_ITEMS = [
 
 export function TopNav() {
   const pathname = usePathname()
-  const { data: session } = useSession()
   const { theme, toggle } = useTheme()
-  const userName = session?.user?.name ?? 'User'
-  const initials = userName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
+  const userName = 'Eleanor Vance'
+  const initials = 'EV'
 
   return (
     <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-ink-950/80 backdrop-blur-xl">
@@ -93,7 +86,7 @@ export function TopNav() {
             <div className="hidden lg:block">
               <div className="text-[12px] font-medium text-bone leading-tight">{userName}</div>
             </div>
-            <UserMenu initials={initials} userName={userName} userEmail={session?.user?.email ?? ''} />
+            <UserMenu initials={initials} userName={userName} userEmail="eleanor@vaultr.demo" />
           </div>
         </div>
       </div>
@@ -145,14 +138,6 @@ function UserMenu({ initials, userName, userEmail }: { initials: string; userNam
           </div>
         </div>
 
-        <div className="border-t border-white/[0.06] pt-1">
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-[12.5px] text-white/70 hover:text-loss hover:bg-white/[0.03] transition"
-          >
-            {Icons.logOut} Sign out
-          </button>
-        </div>
       </div>
     </div>
   )

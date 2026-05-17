@@ -9,7 +9,6 @@ import { Watchlist } from '@/components/dashboard/Watchlist'
 import { InsightsCard } from '@/components/dashboard/InsightsCard'
 import { DashboardActions } from '@/components/dashboard/DashboardActions'
 import { METRICS } from '@/lib/mock-data'
-import { auth } from '@/lib/auth'
 import { fmtPct } from '@/lib/utils'
 
 function getGreeting(hour: number) {
@@ -19,8 +18,7 @@ function getGreeting(hour: number) {
 }
 
 export default async function DashboardPage() {
-  const session = await auth()
-  const firstName = session?.user?.name?.split(' ')[0] ?? 'there'
+  const firstName = 'Eleanor'
   const now = new Date()
   const greeting = getGreeting(now.getHours())
   const dateStr = now.toLocaleDateString('en-US', {

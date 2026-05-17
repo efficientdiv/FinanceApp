@@ -1,9 +1,8 @@
 
-import { redirect } from 'next/navigation'
 import { TopNav } from '@/components/nav/TopNav'
 import { Card } from '@/components/ui/Card'
 import { SectionHeader } from '@/components/ui/SectionHeader'
-import { requireUserId, getSpendingByCategory } from '@/lib/data'
+import { getDemoUserId, getSpendingByCategory } from '@/lib/data'
 import { prisma } from '@/lib/prisma'
 import { centsToDollars } from '@/lib/utils'
 import { Money } from '@/components/ui/Money'
@@ -19,12 +18,7 @@ const SPENDING_COLORS: Record<string, string> = {
 }
 
 export default async function BudgetsPage() {
-  let userId: string
-  try {
-    userId = await requireUserId()
-  } catch {
-    redirect('/login')
-  }
+  const userId = await getDemoUserId()
 
   const [spending, categories] = await Promise.all([
     getSpendingByCategory(userId),

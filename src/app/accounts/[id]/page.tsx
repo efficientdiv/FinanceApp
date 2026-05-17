@@ -1,14 +1,12 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { TopNav } from '@/components/nav/TopNav'
 import { Card } from '@/components/ui/Card'
 import { Icons } from '@/components/ui/Icons'
-import { requireUserId } from '@/lib/data'
+import { getDemoUserId } from '@/lib/data'
 import { prisma } from '@/lib/prisma'
 import { centsToDollars, fmtDate } from '@/lib/utils'
 import { Money } from '@/components/ui/Money'
-
-// Don't prerender any account detail pages — they require auth
 
 interface Params {
   params: Promise<{ id: string }>
@@ -16,13 +14,7 @@ interface Params {
 
 export default async function AccountDetailPage({ params }: Params) {
   const { id } = await params
-
-  let userId: string
-  try {
-    userId = await requireUserId()
-  } catch {
-    redirect('/login')
-  }
+  const userId = await getDemoUserId()
 
   const [account, transactions] = await Promise.all([
     prisma.account.findUnique({ where: { id, userId } }),

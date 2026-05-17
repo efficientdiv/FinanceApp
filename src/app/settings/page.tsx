@@ -1,21 +1,14 @@
 
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { TopNav } from '@/components/nav/TopNav'
 import { Card } from '@/components/ui/Card'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { Icons } from '@/components/ui/Icons'
-import { requireUserId } from '@/lib/data'
+import { getDemoUserId } from '@/lib/data'
 import { prisma } from '@/lib/prisma'
 
 export default async function SettingsPage() {
-  let userId: string
-  try {
-    userId = await requireUserId()
-  } catch {
-    redirect('/login')
-  }
-
+  const userId = await getDemoUserId()
   const user = await prisma.user.findUnique({ where: { id: userId } })
 
   const SETTINGS_SECTIONS = [
@@ -65,17 +58,6 @@ export default async function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="p-6">
-          <SectionHeader eyebrow="Danger zone" title="Account" />
-          <form action="/api/auth/signout" method="POST">
-            <button
-              type="submit"
-              className="h-9 px-4 rounded-lg ring-1 ring-loss/30 text-loss hover:bg-loss/10 text-[13px] font-medium flex items-center gap-2 transition"
-            >
-              {Icons.logOut} Sign out everywhere
-            </button>
-          </form>
-        </Card>
       </main>
     </div>
   )

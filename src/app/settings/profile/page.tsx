@@ -2,7 +2,6 @@
 
 import { useTransition } from 'react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { toast } from 'sonner'
 import { TopNav } from '@/components/nav/TopNav'
 import { Card } from '@/components/ui/Card'
@@ -28,8 +27,10 @@ function Field({
   )
 }
 
+const DEMO_NAME = 'Eleanor Vance'
+const DEMO_EMAIL = 'eleanor@vaultr.demo'
+
 export default function ProfilePage() {
-  const { data: session, update } = useSession()
   const [profilePending, startProfile] = useTransition()
   const [passwordPending, startPassword] = useTransition()
 
@@ -39,7 +40,6 @@ export default function ProfilePage() {
     startProfile(async () => {
       try {
         await updateProfileAction(fd)
-        await update() // refresh session with new name/email
         toast.success('Profile saved')
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Failed to save')
@@ -76,11 +76,11 @@ export default function ProfilePage() {
         {/* Avatar */}
         <Card className="p-6 flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#e9d7b8] to-[#a48962] text-ink-950 font-semibold text-[20px] flex items-center justify-center ring-2 ring-white/10">
-            {(session?.user?.name ?? 'U').split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
+            EV
           </div>
           <div>
-            <div className="text-[14px] font-medium text-bone">{session?.user?.name ?? '—'}</div>
-            <div className="text-[12px] text-white/45 mt-0.5">{session?.user?.email ?? '—'}</div>
+            <div className="text-[14px] font-medium text-bone">{DEMO_NAME}</div>
+            <div className="text-[12px] text-white/45 mt-0.5">{DEMO_EMAIL}</div>
           </div>
         </Card>
 
@@ -89,9 +89,9 @@ export default function ProfilePage() {
           <h3 className="text-[14px] font-semibold text-bone mb-5">Personal information</h3>
           <form className="space-y-5" onSubmit={handleProfile}>
             <Field id="name" label="Full name" placeholder="Your name"
-              defaultValue={session?.user?.name ?? ''} autoComplete="name" />
+              defaultValue={DEMO_NAME} autoComplete="name" />
             <Field id="email" label="Email" type="email" placeholder="you@example.com"
-              defaultValue={session?.user?.email ?? ''} autoComplete="email" />
+              defaultValue={DEMO_EMAIL} autoComplete="email" />
             <div className="pt-1">
               <button type="submit" disabled={profilePending}
                 className="h-10 px-5 rounded-lg bg-bone text-ink-950 font-semibold text-[13.5px] hover:bg-white transition disabled:opacity-50">

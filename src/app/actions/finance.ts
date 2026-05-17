@@ -1,20 +1,14 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/lib/auth'
+import { getDemoUserId } from '@/lib/data'
 import { prisma } from '@/lib/prisma'
 import { dollarsToCents } from '@/lib/utils'
 import bcrypt from 'bcryptjs'
 
-async function requireUser() {
-  const session = await auth()
-  if (!session?.user?.id) throw new Error('Unauthorized')
-  return session.user.id
-}
-
 /* ── Deposit ────────────────────────────────────────────────────────────── */
 export async function depositAction(formData: FormData) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   const accountId = formData.get('accountId') as string
   const amount = parseFloat(formData.get('amount') as string)
   if (!accountId || isNaN(amount) || amount <= 0) throw new Error('Invalid input')
@@ -45,7 +39,7 @@ export async function depositAction(formData: FormData) {
 
 /* ── Move money ─────────────────────────────────────────────────────────── */
 export async function moveMoneyAction(formData: FormData) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   const fromId = formData.get('fromAccountId') as string
   const toId = formData.get('toAccountId') as string
   const amount = parseFloat(formData.get('amount') as string)
@@ -92,7 +86,7 @@ export async function moveMoneyAction(formData: FormData) {
 
 /* ── Categorize transaction ─────────────────────────────────────────────── */
 export async function categorizeTxAction(txId: string, category: string) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   await prisma.transaction.update({
     where: { id: txId, userId },
     data: { category },
@@ -103,7 +97,7 @@ export async function categorizeTxAction(txId: string, category: string) {
 
 /* ── Dismiss insight ────────────────────────────────────────────────────── */
 export async function dismissInsightAction(insightId: string) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   await prisma.insight.update({
     where: { id: insightId, userId },
     data: { dismissedAt: new Date() },
@@ -113,7 +107,7 @@ export async function dismissInsightAction(insightId: string) {
 
 /* ── Add watchlist symbol ───────────────────────────────────────────────── */
 export async function addWatchlistAction(symbol: string) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   const count = await prisma.watchlistItem.count({ where: { userId } })
   await prisma.watchlistItem.upsert({
     where: { userId_symbol: { userId, symbol: symbol.toUpperCase() } },
@@ -125,7 +119,7 @@ export async function addWatchlistAction(symbol: string) {
 
 /* ── Remove watchlist symbol ────────────────────────────────────────────── */
 export async function removeWatchlistAction(symbol: string) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   await prisma.watchlistItem.deleteMany({
     where: { userId, symbol: symbol.toUpperCase() },
   })
@@ -134,7 +128,7 @@ export async function removeWatchlistAction(symbol: string) {
 
 /* ── Update transaction notes ───────────────────────────────────────────── */
 export async function updateTxNotesAction(txId: string, notes: string) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   await prisma.transaction.update({
     where: { id: txId, userId },
     data: { notes },
@@ -144,7 +138,7 @@ export async function updateTxNotesAction(txId: string, notes: string) {
 
 /* ── Toggle recurring flag ──────────────────────────────────────────────── */
 export async function toggleRecurringAction(txId: string, isRecurring: boolean) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   await prisma.transaction.update({
     where: { id: txId, userId },
     data: { isRecurring },
@@ -154,7 +148,7 @@ export async function toggleRecurringAction(txId: string, isRecurring: boolean) 
 
 /* ── Update budget ──────────────────────────────────────────────────────── */
 export async function updateBudgetAction(categoryName: string, monthlyBudgetDollars: number) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   await prisma.category.updateMany({
     where: { userId, name: categoryName },
     data: { budgetMonthlyCents: dollarsToCents(monthlyBudgetDollars) },
@@ -164,7 +158,7 @@ export async function updateBudgetAction(categoryName: string, monthlyBudgetDoll
 
 /* ── Update profile ─────────────────────────────────────────────────────── */
 export async function updateProfileAction(formData: FormData) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   const name = (formData.get('name') as string)?.trim()
   const email = (formData.get('email') as string)?.trim().toLowerCase()
 
@@ -180,7 +174,7 @@ export async function updateProfileAction(formData: FormData) {
 
 /* ── Change password ────────────────────────────────────────────────────── */
 export async function changePasswordAction(formData: FormData) {
-  const userId = await requireUser()
+  const userId = await getDemoUserId()
   const current = (formData.get('current') as string) ?? ''
   const next = (formData.get('new') as string) ?? ''
   const confirm = (formData.get('confirm') as string) ?? ''
